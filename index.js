@@ -60,7 +60,6 @@ function addToWL(e, title, year, image, index) {
         }
         localMovies.push(saveMovie)
         localStorage.setItem("movies", JSON.stringify(localMovies))
-        console.log(JSON.parse(localStorage.getItem("movies")))
     }
 }
 
