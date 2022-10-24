@@ -9,8 +9,9 @@ const options = {
 const movieNameInput = document.getElementById("movieName")
 const searchBtn = document.getElementById("searchBtn")
 const resultsContainer = document.getElementById("results-container")
-
 searchBtn.addEventListener("click", getMovie)
+
+let localMovies
 
 document.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
@@ -28,30 +29,43 @@ function getMovie(){
             movieNameInput.value = ""
         })
         .catch(err => {
-            
+            console.log(err)
         })
 }
 
 
 function displayMovies(data) {
     const movieArray = data.results
-
-    movieArray.forEach(movie => {
-        const movieName = document.createElement("h2")
-        movieName.innerText = movie.title
-        const movieYear = document.createElement("p")
-        movieYear.innerText = movie.year
-        const moviePoster = document.createElement("img")
-        moviePoster.src = movie.image.url
-        const rightColumn = document.createElement("div")
-        rightColumn.classList.add("right-column")
-        rightColumn.appendChild(movieName)
-        rightColumn.appendChild(movieYear)
-        const movieContainer = document.createElement("div")
-        movieContainer.classList.add("movie-box")
-        movieContainer.appendChild(moviePoster)
-        movieContainer.appendChild(rightColumn)
-        resultsContainer.appendChild(movieContainer)
-    })
-
+    const movieHTML = movieArray.map((movie,index) => {
+        return `
+        <div class="movie-box" onClick="addToWL(event, '${movie.title}', '${movie.year}', '${movie.image.url}', '${index}')">
+            <img src=${movie.image.url} />
+            <div class="right-column">
+                <h2>${movie.title}</h2>
+                <p>${movie.year}</h2>
+                <button class="add-btn">Add</button>
+            </div>
+        </div>
+        `
+    }).join("")
+    resultsContainer.innerHTML = movieHTML
 }
+
+function addToWL(e, title, year, image, index) {
+    if(e.target.classList.contains("add-btn")){
+        const saveMovie = {
+            title,
+            year,
+            image
+        }
+        localMovies.push(saveMovie)
+        localStorage.setItem("movies", JSON.stringify(localMovies))
+        console.log(JSON.parse(localStorage.getItem("movies")))
+    }
+}
+
+function getLocalMovies(){
+    localMovies = JSON.parse(localStorage.getItem("movies")) || []
+}
+
+getLocalMovies()
